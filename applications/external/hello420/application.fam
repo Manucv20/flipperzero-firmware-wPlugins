@@ -1,0 +1,11 @@
+App(
+    appid="hello420",
+    name="Hello 420",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="hello420_main",
+    requires=["gui"],
+    stack_size=1 * 1024,
+    fap_icon="hello420_10px.png",
+    fap_category="Games",
+    fap_icon_assets="images",
+)

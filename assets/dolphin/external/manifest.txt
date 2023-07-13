@@ -112,3 +112,24 @@ Max butthurt: 14
 Min level: 2
 Max level: 30
 Weight: 7
+
+Name: catBread
+Min butthurt: 0
+Max butthurt: 14
+Min level: 2
+Max level: 30
+Weight: 8
+
+Name: catKiss
+Min butthurt: 0
+Max butthurt: 14
+Min level: 2
+Max level: 30
+Weight: 8
+
+Name: catOmg
+Min butthurt: 0
+Max butthurt: 14
+Min level: 2
+Max level: 30
+Weight: 8
