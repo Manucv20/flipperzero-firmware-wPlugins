@@ -5,13 +5,14 @@
 #include "../helpers/archive_browser.h"
 #include "../views/archive_browser_view.h"
 #include "archive/scenes/archive_scene.h"
+#include <applications.h>
 
 #define TAG "ArchiveSceneBrowser"
 
 #define SCENE_STATE_DEFAULT (0)
 #define SCENE_STATE_NEED_REFRESH (1)
 
-const char* archive_get_flipper_app_name(ArchiveFileTypeEnum file_type) {
+static const char* archive_get_flipper_app_name(ArchiveFileTypeEnum file_type) {
     switch(file_type) {
     case ArchiveFileTypeIButton:
         return "iButton";
@@ -68,16 +69,21 @@ static void archive_run_in_app(ArchiveBrowserView* browser, ArchiveFile_t* selec
         } else {
             if(strcmp(app_name, "iButton") == 0) {
                 loader_start_with_gui_error(
-                    loader, "/ext/apps/Main/iButton.fap", furi_string_get_cstr(selected->path));
+                    loader, "/ext/apps/iButton/iButton.fap", furi_string_get_cstr(selected->path));
             } else if(strcmp(app_name, "Bad USB") == 0) {
                 loader_start_with_gui_error(
-                    loader, "/ext/apps/Main/bad_usb.fap", furi_string_get_cstr(selected->path));
+                    loader, "/ext/apps/USB/bad_usb.fap", furi_string_get_cstr(selected->path));
             } else if(strcmp(app_name, "Infrared") == 0) {
                 loader_start_with_gui_error(
-                    loader, "/ext/apps/Main/infrared.fap", furi_string_get_cstr(selected->path));
+                    loader,
+                    "/ext/apps/Infrared/infrared.fap",
+                    furi_string_get_cstr(selected->path));
             } else if(strcmp(app_name, "125 kHz RFID") == 0) {
                 loader_start_with_gui_error(
-                    loader, "/ext/apps/Main/lfrfid.fap", furi_string_get_cstr(selected->path));
+                    loader, "/ext/apps/RFID/lfrfid.fap", furi_string_get_cstr(selected->path));
+            } else if(strcmp(app_name, "Sub-GHz") == 0) {
+                loader_start_with_gui_error(
+                    loader, "/ext/apps/Sub-GHz/subghz.fap", furi_string_get_cstr(selected->path));
             } else {
                 loader_start_with_gui_error(
                     loader, app_name, furi_string_get_cstr(selected->path));

@@ -2,7 +2,6 @@
 #include <furi_hal_spi.h>
 #include <furi_hal_resources.h>
 #include <furi_hal_power.h>
-#include <furi_hal_subghz.h>
 #include <furi_hal_interrupt.h>
 
 #include <stm32wbxx_ll_dma.h>
@@ -12,32 +11,11 @@
 
 #define TAG "FuriHalSpi"
 
-void furi_hal_spi_init_early() {
-    furi_hal_spi_bus_init(&furi_hal_spi_bus_d);
-    furi_hal_spi_bus_handle_init(&furi_hal_spi_bus_handle_display);
-}
-
-void furi_hal_spi_deinit_early() {
-    furi_hal_spi_bus_handle_deinit(&furi_hal_spi_bus_handle_display);
-    furi_hal_spi_bus_deinit(&furi_hal_spi_bus_d);
-}
-
-void furi_hal_spi_init() {
-    furi_hal_spi_bus_init(&furi_hal_spi_bus_r);
-
-    furi_hal_spi_bus_handle_init(furi_hal_subghz.spi_bus_handle);
-    furi_hal_spi_bus_handle_init(&furi_hal_spi_bus_handle_nfc);
-    furi_hal_spi_bus_handle_init(&furi_hal_spi_bus_handle_sd_fast);
-    furi_hal_spi_bus_handle_init(&furi_hal_spi_bus_handle_sd_slow);
-
-    FURI_LOG_I(TAG, "Init OK");
-}
-
 #define SPI_DMA DMA2
-#define SPI_DMA_RX_CHANNEL LL_DMA_CHANNEL_3
-#define SPI_DMA_TX_CHANNEL LL_DMA_CHANNEL_4
-#define SPI_DMA_RX_IRQ FuriHalInterruptIdDma2Ch3
-#define SPI_DMA_TX_IRQ FuriHalInterruptIdDma2Ch4
+#define SPI_DMA_RX_CHANNEL LL_DMA_CHANNEL_6
+#define SPI_DMA_TX_CHANNEL LL_DMA_CHANNEL_7
+#define SPI_DMA_RX_IRQ FuriHalInterruptIdDma2Ch6
+#define SPI_DMA_TX_IRQ FuriHalInterruptIdDma2Ch7
 #define SPI_DMA_RX_DEF SPI_DMA, SPI_DMA_RX_CHANNEL
 #define SPI_DMA_TX_DEF SPI_DMA, SPI_DMA_TX_CHANNEL
 
@@ -192,18 +170,18 @@ bool furi_hal_spi_bus_trx(
 }
 
 static void spi_dma_isr() {
-#if SPI_DMA_RX_CHANNEL == LL_DMA_CHANNEL_3
-    if(LL_DMA_IsActiveFlag_TC3(SPI_DMA) && LL_DMA_IsEnabledIT_TC(SPI_DMA_RX_DEF)) {
-        LL_DMA_ClearFlag_TC3(SPI_DMA);
+#if SPI_DMA_RX_CHANNEL == LL_DMA_CHANNEL_6
+    if(LL_DMA_IsActiveFlag_TC6(SPI_DMA) && LL_DMA_IsEnabledIT_TC(SPI_DMA_RX_DEF)) {
+        LL_DMA_ClearFlag_TC6(SPI_DMA);
         furi_check(furi_semaphore_release(spi_dma_completed) == FuriStatusOk);
     }
 #else
 #error Update this code. Would you kindly?
 #endif
 
-#if SPI_DMA_TX_CHANNEL == LL_DMA_CHANNEL_4
-    if(LL_DMA_IsActiveFlag_TC4(SPI_DMA) && LL_DMA_IsEnabledIT_TC(SPI_DMA_TX_DEF)) {
-        LL_DMA_ClearFlag_TC4(SPI_DMA);
+#if SPI_DMA_TX_CHANNEL == LL_DMA_CHANNEL_7
+    if(LL_DMA_IsActiveFlag_TC7(SPI_DMA) && LL_DMA_IsEnabledIT_TC(SPI_DMA_TX_DEF)) {
+        LL_DMA_ClearFlag_TC7(SPI_DMA);
         furi_check(furi_semaphore_release(spi_dma_completed) == FuriStatusOk);
     }
 #else
@@ -263,8 +241,8 @@ bool furi_hal_spi_bus_trx_dma(
         dma_config.Priority = LL_DMA_PRIORITY_MEDIUM;
         LL_DMA_Init(SPI_DMA_TX_DEF, &dma_config);
 
-#if SPI_DMA_TX_CHANNEL == LL_DMA_CHANNEL_4
-        LL_DMA_ClearFlag_TC4(SPI_DMA);
+#if SPI_DMA_TX_CHANNEL == LL_DMA_CHANNEL_7
+        LL_DMA_ClearFlag_TC7(SPI_DMA);
 #else
 #error Update this code. Would you kindly?
 #endif
@@ -337,8 +315,8 @@ bool furi_hal_spi_bus_trx_dma(
         dma_config.Priority = LL_DMA_PRIORITY_MEDIUM;
         LL_DMA_Init(SPI_DMA_RX_DEF, &dma_config);
 
-#if SPI_DMA_RX_CHANNEL == LL_DMA_CHANNEL_3
-        LL_DMA_ClearFlag_TC3(SPI_DMA);
+#if SPI_DMA_RX_CHANNEL == LL_DMA_CHANNEL_6
+        LL_DMA_ClearFlag_TC6(SPI_DMA);
 #else
 #error Update this code. Would you kindly?
 #endif

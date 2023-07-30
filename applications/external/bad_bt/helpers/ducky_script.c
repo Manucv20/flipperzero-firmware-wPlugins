@@ -118,6 +118,7 @@ bool ducky_get_number(const char* param, uint32_t* val) {
 }
 
 void ducky_numlock_on(BadBtScript* bad_bt) {
+    UNUSED(bad_bt);
     if((furi_hal_bt_hid_get_led_state() & HID_KB_LED_NUM) == 0) {
         furi_hal_bt_hid_kb_press(HID_KEYBOARD_LOCK_NUM_LOCK);
         furi_delay_ms(bt_timeout);
@@ -126,6 +127,7 @@ void ducky_numlock_on(BadBtScript* bad_bt) {
 }
 
 bool ducky_numpad_press(BadBtScript* bad_bt, const char num) {
+    UNUSED(bad_bt);
     if((num < '0') || (num > '9')) return false;
 
     uint16_t key = numpad_keys[num - '0'];
@@ -253,8 +255,12 @@ static int32_t ducky_parse_line(BadBtScript* bad_bt, FuriString* line) {
     }
     if((key & 0xFF00) != 0) {
         // It's a modifier key
-        line_tmp = &line_tmp[ducky_get_command_len(line_tmp) + 1];
-        key |= ducky_get_keycode(bad_bt, line_tmp, true);
+        uint32_t offset = ducky_get_command_len(line_tmp) + 1;
+        // ducky_get_command_len() returns 0 without space, so check for != 1
+        if(offset != 1 && line_len > offset) {
+            // It's also a key combination
+            key |= ducky_get_keycode(bad_bt, line_tmp + offset, true);
+        }
     }
     furi_hal_bt_hid_kb_press(key);
     furi_delay_ms(bt_timeout);
